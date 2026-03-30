@@ -14,6 +14,8 @@ class ShortURL(models.Model):
     short_code = models.CharField(max_length=6, unique=True, db_index=True)
     created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    is_active = models.BooleanField(default=True)
+    expires_at = models.DateTimeField(null=True, blank=True)
     click_count = models.PositiveIntegerField(default=0)
 
     def save(self, *args, **kwargs):
