@@ -1,4 +1,7 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect, get_object_or_404
+from django.http import HttpResponseGone
+from django.db.models import F
+from analytics.models import Click
 from .models import ShortURL
 
 def home(request):
@@ -8,3 +11,24 @@ def home(request):
         obj = ShortURL.objects.create(original_url=original_url)
         short_url = request.build_absolute_uri(f"/s/{obj.short_code}/")
     return render(request, "home.html", {"short_url": short_url})
+
+def redirect_view(request, code):
+    obj = get_object_or_404(ShortURL, short_code=code)
+
+    if not obj.is_active:
+        return HttpResponseGone("The link is inactive")
+    
+    if obj.expires_at and obj.expires_at < obj.created_at:
+        return HttpResponseGone("The link has expired")
+    
+    ShortURL.objects.filter(id=obj.id).update(click_count=F('click_count') + 1)
+
+    Click.objects.create(
+        short_url = obj,
+        ip_address = request.META.get("REMOTE_ADDR"),
+        user_agent = request.META.get("HTTP_USER_AGENT"),
+        referer = request.META.get("HTTP_REFERER"),
+        country = "India"
+    )
+
+    return redirect(obj.original_url)
