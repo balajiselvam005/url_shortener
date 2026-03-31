@@ -9,6 +9,7 @@
         <form method="POST">
             {% csrf_token %}
             <input type="url" name="url" placeholder="Enter URL" required>
+            <input type="text" name="custom_alias" placeholder="Custom alias (optional)">
             <button type="submit">Shorten</button>
         </form>
 
