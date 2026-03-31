@@ -9,12 +9,14 @@
         {% csrf_token %}
         <table border='1'>
             <tr>
+                <th>Select</th>
                 <th>Short Code</th>
                 <th>Original URL</th>
                 <th>Clicks</th>
                 <th>Created</th>
                 <th>Status</th>
                 <th>Action</th>
+                <th>Analytics</th>
             </tr>
 
         
@@ -43,6 +45,9 @@
                                 Activate
                             {% endif %}
                         </a>
+                    </td>
+                    <td>
+                        <a href="/dashboard/{{ url.short_code }}/analytics/">View</a>
                     </td>
                 </tr>
             {% endfor %}

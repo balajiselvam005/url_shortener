@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+
+
+{% block content %}
+
+    <h2>Analytics for {{ url.short_code }}</h2>
+
+    <p><b>Total Clicks:</b> {{ total_clicks }}</p>
+
+    <hr>
+
+    <h3>Clicks Per Day (Last 30 Days)</h3>
+    <table border="1">
+        <tr>
+            <th>Date</th>
+            <th>Clicks</th>
+        </tr>
+
+        
+        {% for item in clicks_per_day %}
+            <tr>
+                <td>{{ item.day }}</td>
+                <td>{{ item.count }}</td>
+            </tr>
+        {% empty %}
+            <tr>
+                <td colspan="2">No data</td>
+            </tr>
+        {% endfor %}
+    </table>
+
+    <hr>
+
+    <h3>Top Referers</h3>
+    <table border="1">
+        <tr>
+            <th>Referer</th>
+            <th>Clicks</th>
+        </tr>
+
+        
+        {% for ref in top_referers %}
+
+            <tr>
+                <td>{{ ref.referer|default:"Direct" }}</td>
+                <td>{{ ref.count }}</td>
+            </tr>
+        {% empty %}
+            <tr>
+                <td colspan="2">No data</td>
+            </tr>
+            
+        {% endfor %}
+    </table>
+
+    <hr>
+
+    <h3>Recent Clicks</h3>
+    <table border="1">
+        <tr>
+            <th>Time</th>
+            <th>IP</th>
+            <th>Referer</th>
+        </tr>
+
+        {% for click in recent_clicks %}
+        <tr>
+            <td>{{ click.clicked_at }}</td>
+            <td>{{ click.ip_address }}</td>
+            <td>{{ click.referer|default:"Direct" }}</td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="3">No recent clicks</td>
+        </tr>
+    {% endfor %}
+    </table>
+    
+{% endblock %}
+    

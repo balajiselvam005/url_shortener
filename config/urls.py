@@ -17,7 +17,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from django.contrib.auth import views as auth_views
-from analytics.views import dashboard
+from analytics.views import dashboard, analytics_view
 from shortener.views import home, redirect_view, toggle_url
 
 urlpatterns = [
@@ -26,6 +26,7 @@ urlpatterns = [
     path('s/<str:code>/', redirect_view),
     path('dashboard/', dashboard),
     path('toggle/<int:id>/', toggle_url),
+    path('dashboard/<str:code>/analytics/', analytics_view),
 
     path('login/', auth_views.LoginView.as_view(template_name='login.html', redirect_authenticated_user=True)),
     path('logout/', auth_views.LogoutView.as_view(next_page='/'))
