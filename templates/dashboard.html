@@ -5,59 +5,61 @@
 
     <h2>Dashboard</h2>
 
-    <form method="POST">
-        {% csrf_token %}
-        <table border='1'>
-            <tr>
-                <th>Select</th>
-                <th>Short Code</th>
-                <th>Original URL</th>
-                <th>Clicks</th>
-                <th>Created</th>
-                <th>Status</th>
-                <th>Action</th>
-                <th>Analytics</th>
-            </tr>
-
-        
-            {% for url in urls %}
+    <div class="card">
+        <form method="POST">
+            {% csrf_token %}
+            <table border='1'>
                 <tr>
-                    <td><input type="checkbox" name="selected_urls" value="{{url.id}}"></td>
-                    <td><a href="/s/{{ url.short_code }}/">{{ url.short_code }}</a></td>
-                    <td>{{ url.original_url }}</td>
-                    <td>{{ url.click_count }}</td>
-                    <td>{{ url.created_at }}</td>
-                    <td>
-                        
-                        {% if url.is_active %}
-                            Active
-                        {% else %}
-                            Inactive
-                        {% endif %}
-                            
-                    </td>
-                    <td>
-                        <a href="/toggle/{{url.id}}">
+                    <th>Select</th>
+                    <th>Short Code</th>
+                    <th>Original URL</th>
+                    <th>Clicks</th>
+                    <th>Created</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                    <th>Analytics</th>
+                </tr>
+
+            
+                {% for url in urls %}
+                    <tr>
+                        <td><input type="checkbox" name="selected_urls" value="{{url.id}}"></td>
+                        <td><a href="/s/{{ url.short_code }}/">{{ url.short_code }}</a></td>
+                        <td>{{ url.original_url }}</td>
+                        <td>{{ url.click_count }}</td>
+                        <td>{{ url.created_at }}</td>
+                        <td>
                             
                             {% if url.is_active %}
-                                Deactivate
+                                Active
                             {% else %}
-                                Activate
+                                Inactive
                             {% endif %}
-                        </a>
-                    </td>
-                    <td>
-                        <a href="/dashboard/{{ url.short_code }}/analytics/">View</a>
-                    </td>
-                </tr>
-            {% endfor %}
-            
-         </table>
+                                
+                        </td>
+                        <td>
+                            <a href="/toggle/{{url.id}}">
+                                
+                                {% if url.is_active %}
+                                    Deactivate
+                                {% else %}
+                                    Activate
+                                {% endif %}
+                            </a>
+                        </td>
+                        <td>
+                            <a href="/dashboard/{{ url.short_code }}/analytics/">View</a>
+                        </td>
+                    </tr>
+                {% endfor %}
+                
+            </table>
 
-         <br>
+            <br>
 
-         <button type="submit">Delete Selected</button>
-    </form>
+            <button type="submit">Delete Selected</button>
+        </form>
+    </div>
 
 {% endblock %}
     

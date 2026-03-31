@@ -2,23 +2,160 @@
 <html>
     <head>
         <title>URL Shortener</title>
-    </head>
-    <body>
-        <nav>
-            <a href="/">Home</a>
-            <a href="/dashboard/">Dashboard</a>
 
-            
-            {% if user.is_authenticated %}
-                <a href="/logout/">Logout</a>
-            {% else %}
-                <a href="/login/">Login</a>
-            {% endif %}
-                
+        <style>
+            body {
+                margin: 0;
+                font-family: Arial;
+                background-color: #07161B;
+                color: #E6F1F3;
+            }
+
+            nav {
+                background-color: #0F2A30;
+                padding: 15px 30px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                border-bottom: 1px solid #1f3a40;
+            }
+
+            .nav-left a {
+                margin-right: 20px;
+            }
+
+            .nav-right a {
+                margin-left: 20px;
+            }
+
+            .container {
+                padding: 30px;
+                max-width: 1100px;
+                margin: auto;
+            }
+
+            .chart-grid {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 20px;
+            }
+
+            .chart-container {
+                background-color: #0F2A30;
+                padding: 20px;
+                border-radius: 8px;
+            }
+
+            .chart-container h3 {
+                margin-bottom: 15px;
+            }
+
+            h2, h3 {
+                color: #3D737F;
+            }
+
+            h2 {
+                font-size: 24px;
+                margin-bottom: 20px;
+            }
+
+            h3 {
+                font-size: 18px;
+                margin-bottom: 10px;
+            }
+
+            .card {
+                background-color: #0F2A30;
+                padding: 20px;
+                border-radius: 8px;
+                margin-bottom: 20px;
+            }
+
+            .card, .chart-container {
+                border: 1px solid #1f3a40;
+            }
+
+            .total-card {
+                text-align: center;
+                padding: 30px;
+            }
+
+            .total-card h1 {
+                font-size: 48px;
+                margin: 10px 0;
+                color: #3D737F;
+            }
+
+            .total-card p {
+                color: #A1C9CE;
+                font-size: 14px;
+            }
+
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                background-color: #0F2A30;
+                border-radius: 8px;
+                overflow: hidden;
+            }
+
+            th, td {
+                padding: 12px;
+                text-align: left;
+                color: #CFE9ED;
+            }
+
+            th {
+                text-align: left;
+                font-size: 14px;
+                background-color: #3D737F;
+                color: #07161B;
+            }
+
+            tr:nth-child(even) {
+                background-color: #0B2227;
+            }
+
+            button {
+                background-color: #3D737F;
+                border: none;
+                padding: 10px 15px;
+                color: #07161B;
+                font-weight: bold;
+                border-radius: 5px;
+                cursor: pointer;
+            }
+
+            input {
+                padding: 10px;
+                border-radius: 5px;
+                border: none;
+                width: 350px;
+            }
+        </style>
+
+    </head>
+
+    <body>
+
+        <nav>
+            <div class="nav-left">
+                <a href="/">Home</a>
+                <a href="/dashboard/">Dashboard</a>
+            </div>
+
+            <div class="nav-right">
+                {% if user.is_authenticated %}
+                    <a href="/logout/">Logout</a>
+                {% else %}
+                    <a href="/login/">Login</a>
+                {% endif %}
+            </div>
         </nav>
 
-        <hr>
+        <div class="container">
+            {% block content %}{% endblock %}
+        </div>
 
-        {% block content %}  {% endblock %}
     </body>
 </html>

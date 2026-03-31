@@ -7,45 +7,49 @@
 
     <h2>Analytics for {{ url.short_code }}</h2>
 
-    <p><b>Total Clicks:</b> {{ total_clicks }}</p>
+    <div class="card total-card">
+        <p>Total Clicks</p>
+        <h1>{{ total_clicks }}</h1>
+    </div>
 
-    <hr>
+    <div class="chart-grid">
 
-    <h3>Clicks Per Day (Last 30 Days)</h3>
+        <div class="chart-container">
+            <h3>Clicks Per Day</h3>
+            <canvas id="clickChart"></canvas>
+        </div>
 
-    <canvas id="clickChart"></canvas>
+        <div class="chart-container">
+            <h3>Top Referers</h3>
+            <canvas id="refererChart"></canvas>
+        </div>
 
-    <hr>
+    </div>
 
+    <div class="card">
+        <h3>Recent Clicks</h3>
+    
+        <table border="1">
+            <tr>
+                <th>Time</th>
+                <th>IP</th>
+                <th>Referer</th>
+            </tr>
+    
+            {% for click in recent_clicks %}
+            <tr>
+                <td>{{ click.clicked_at }}</td>
+                <td>{{ click.ip_address }}</td>
+                <td>{{ click.referer|default:"Direct" }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="3">No recent clicks</td>
+            </tr>
+        {% endfor %}
+        </table>
+    </div>
 
-    <h3>Top Referers</h3>
-
-
-    <canvas id="refererChart"></canvas>
-
-    <hr>
-
-    <h3>Recent Clicks</h3>
-
-    <table border="1">
-        <tr>
-            <th>Time</th>
-            <th>IP</th>
-            <th>Referer</th>
-        </tr>
-
-        {% for click in recent_clicks %}
-        <tr>
-            <td>{{ click.clicked_at }}</td>
-            <td>{{ click.ip_address }}</td>
-            <td>{{ click.referer|default:"Direct" }}</td>
-        </tr>
-        {% empty %}
-        <tr>
-            <td colspan="3">No recent clicks</td>
-        </tr>
-    {% endfor %}
-    </table>
 
     <script src="{% static 'js/chart.js' %}"></script>
 
@@ -59,9 +63,29 @@
             data: {
                 labels: clickLabels,
                 datasets: [{
-                    label: 'Clicks per Day',
-                    data: clickCounts
+                    label: 'Clicks per day',
+                    data: clickCounts,
+                    backgroundColor: '#3D737F'
                 }]
+            },
+            options: {
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: '#E6F1F3'
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        ticks: { color: '#E6F1F3' },
+                        grid: { color: '#1f3a40' }
+                    },
+                    y: {
+                        ticks: { color: '#E6F1F3' },
+                        grid: { color: '#1f3a40' }
+                    }
+                }
             }
         });
 
@@ -74,8 +98,23 @@
             data: {
                 labels: refererLabels,
                 datasets: [{
-                    data: refererCounts
+                    data: refererCounts,
+                    backgroundColor: [
+                        '#3D737F',
+                        '#5AA9A6',
+                        '#7FC8A9',
+                        '#A1E3D8'
+                    ]
                 }]
+            },
+            options: {
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: '#E6F1F3'
+                        }
+                    }
+                }
             }
         });
     </script>
