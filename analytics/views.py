@@ -1,3 +1,5 @@
+import json
+
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404
@@ -52,7 +54,7 @@ def analytics_view(request, code):
     return render(request, "analytics.html", {
         "url": url,
         "total_clicks": total_clicks,
-        "clicks_per_day": clicks_per_day,
-        "top_referers": top_referers,
+        "clicks_per_day": json.dumps(list(clicks_per_day), default=str),
+        "top_referers": json.dumps(list(top_referers)),
         "recent_clicks": recent_clicks
     })

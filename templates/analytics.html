@@ -1,5 +1,7 @@
 {% extends 'base.html' %}
 
+{% load static %}
+
 
 {% block content %}
 
@@ -10,52 +12,21 @@
     <hr>
 
     <h3>Clicks Per Day (Last 30 Days)</h3>
-    <table border="1">
-        <tr>
-            <th>Date</th>
-            <th>Clicks</th>
-        </tr>
 
-        
-        {% for item in clicks_per_day %}
-            <tr>
-                <td>{{ item.day }}</td>
-                <td>{{ item.count }}</td>
-            </tr>
-        {% empty %}
-            <tr>
-                <td colspan="2">No data</td>
-            </tr>
-        {% endfor %}
-    </table>
+    <canvas id="clickChart"></canvas>
 
     <hr>
 
+
     <h3>Top Referers</h3>
-    <table border="1">
-        <tr>
-            <th>Referer</th>
-            <th>Clicks</th>
-        </tr>
 
-        
-        {% for ref in top_referers %}
 
-            <tr>
-                <td>{{ ref.referer|default:"Direct" }}</td>
-                <td>{{ ref.count }}</td>
-            </tr>
-        {% empty %}
-            <tr>
-                <td colspan="2">No data</td>
-            </tr>
-            
-        {% endfor %}
-    </table>
+    <canvas id="refererChart"></canvas>
 
     <hr>
 
     <h3>Recent Clicks</h3>
+
     <table border="1">
         <tr>
             <th>Time</th>
@@ -75,6 +46,39 @@
         </tr>
     {% endfor %}
     </table>
+
+    <script src="{% static 'js/chart.js' %}"></script>
+
+    <script>
+        const clicksData = {{ clicks_per_day|safe }};
+        const clickLabels = clicksData.map(item => item.day.split("T")[0]);
+        const clickCounts = clicksData.map(item => item.count);
+
+        new Chart(document.getElementById('clickChart'), {
+            type: 'bar',
+            data: {
+                labels: clickLabels,
+                datasets: [{
+                    label: 'Clicks per Day',
+                    data: clickCounts
+                }]
+            }
+        });
+
+        const refererData = {{ top_referers|safe }};
+        const refererLabels = refererData.map(item => item.referer || "Direct");
+        const refererCounts = refererData.map(item => item.count);
+
+        new Chart(document.getElementById('refererChart'), {
+            type: 'pie',
+            data: {
+                labels: refererLabels,
+                datasets: [{
+                    data: refererCounts
+                }]
+            }
+        });
+    </script>
     
 {% endblock %}
     
