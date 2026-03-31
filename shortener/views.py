@@ -1,6 +1,7 @@
 from django.utils import timezone
 
 from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseGone
 from django.db.models import F
 from analytics.models import Click
@@ -34,3 +35,12 @@ def redirect_view(request, code):
     )
 
     return redirect(obj.original_url)
+
+@login_required
+def toggle_url(request, id):
+    obj = get_object_or_404(ShortURL, id=id, created_by=request.user)
+    
+    obj.is_active = not obj.is_active
+    obj.save()
+
+    return redirect("/dashboard/")
