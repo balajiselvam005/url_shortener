@@ -1,3 +1,5 @@
+from django.utils import timezone
+
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponseGone
 from django.db.models import F
@@ -8,7 +10,7 @@ def home(request):
     short_url = None
     if request.method == "POST":
         original_url = request.POST.get("url")
-        obj = ShortURL.objects.create(original_url=original_url)
+        obj = ShortURL.objects.create(original_url=original_url, created_by=request.user if request.user.is_authenticated else None)
         short_url = request.build_absolute_uri(f"/s/{obj.short_code}/")
     return render(request, "home.html", {"short_url": short_url})
 
@@ -18,7 +20,7 @@ def redirect_view(request, code):
     if not obj.is_active:
         return HttpResponseGone("The link is inactive")
     
-    if obj.expires_at and obj.expires_at < obj.created_at:
+    if obj.expires_at and obj.expires_at < timezone.now():
         return HttpResponseGone("The link has expired")
     
     ShortURL.objects.filter(id=obj.id).update(click_count=F('click_count') + 1)
