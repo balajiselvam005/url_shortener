@@ -8,51 +8,74 @@ from django.utils import timezone
 
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponseGone
+from django.http import Http404
 from django.db.models import F, Q
 from analytics.models import Click
 from .models import ShortURL, generate_code
 
 def home(request):
     short_url = None
+    error = None
+    
     if request.method == "POST":
-        original_url = request.POST.get("url")
-        custom_alias = request.POST.get("custom_alias")
-        if custom_alias:
-            obj = ShortURL.objects.create(original_url=original_url, short_code=custom_alias, created_by=request.user if request.user.is_authenticated else None)
-        else:
-            obj = ShortURL.objects.create(original_url=original_url, created_by=request.user if request.user.is_authenticated else None)
-        short_url = request.build_absolute_uri(f"/s/{obj.short_code}/")
-    return render(request, "home.html", {"short_url": short_url})
+        try:
+            original_url = request.POST.get("url")
+            custom_alias = request.POST.get("custom_alias")
+
+            if not original_url:
+                error = "URL is required"
+
+            elif custom_alias and ShortURL.objects.filter(short_code=custom_alias).exists():
+                error = "Custom alias already exists"
+
+            else:
+                ip = request.META.get("REMOTE_ADDR")
+                obj = ShortURL.objects.create(ip_address=ip, original_url=original_url, short_code=custom_alias if custom_alias else None, created_by=request.user if request.user.is_authenticated else None)
+            
+                short_url = request.build_absolute_uri(f"/s/{obj.short_code}/")
+
+        except Exception as e:
+            error = "Something went wrong"
+
+    return render(request, "home.html", {"short_url": short_url, "error": error})
 
 def redirect_view(request, code):
     obj = get_object_or_404(ShortURL, Q(short_code=code) | Q(custom_alias=code))
 
     if not obj.is_active:
-        return HttpResponseGone("The link is inactive")
+        return Http404("The link is inactive")
     
     if obj.expires_at and obj.expires_at < timezone.now():
-        return HttpResponseGone("The link has expired")
+        return Http404("The link has expired")
     
-    ShortURL.objects.filter(id=obj.id).update(click_count=F('click_count') + 1)
+    try:
+    
+        ShortURL.objects.filter(id=obj.id).update(click_count=F('click_count') + 1)
 
-    Click.objects.create(
-        short_url = obj,
-        ip_address = request.META.get("REMOTE_ADDR"),
-        user_agent = request.META.get("HTTP_USER_AGENT"),
-        referer = request.META.get("HTTP_REFERER") or "",
-        country = "India"
-    )
+        Click.objects.create(
+            short_url = obj,
+            ip_address = request.META.get("REMOTE_ADDR"),
+            user_agent = request.META.get("HTTP_USER_AGENT"),
+            referer = request.META.get("HTTP_REFERER") or "",
+            country = "India"
+        )
+    
+    except:
+        pass
 
     return redirect(obj.original_url)
 
 def generate_qr(request, code):
-    obj = get_object_or_404(ShortURL, short_code=code)
-    url = request.build_absolute_uri(f"/s/{obj.short_code}")
-    qr = qrcode.make(url)
-    response = HttpResponse(content_type="image/png")
-    qr.save(response, "PNG")
-    return response
+    try:
+        obj = get_object_or_404(ShortURL, short_code=code)
+        url = request.build_absolute_uri(f"/s/{obj.short_code}")
+        qr = qrcode.make(url)
+        response = HttpResponse(content_type="image/png")
+        qr.save(response, "PNG")
+        return response
+    
+    except Exception:
+        return HttpResponse("QR generation failed", status=500)
 
 @csrf_exempt
 def api_shorten(request):
@@ -64,6 +87,12 @@ def api_shorten(request):
         data = json.loads(request.body)
     except:
         return JsonResponse({"error": "Invalid JSON"}, status=400)
+    
+    ip = request.META.get("REMOTE_ADDR")
+    last_hour = now() - timedelta(hours=1)
+    count = ShortURL.objects.filter(ip_address=ip , created_at__gte=last_hour).count()
+    if count >= 10:
+        return JsonResponse({"error": "Rate Limit Exceeded"}, status=429)
 
     url = data.get("url")
     custom_alias = data.get("custom_alias")
@@ -83,7 +112,8 @@ def api_shorten(request):
     if expires_days:
         expires_at = now() + timedelta(days=int(expires_days))
 
-    obj = ShortURL.objects.create(
+    obj = ShortURL.objects.create(  
+        ip_address=ip,
         original_url=url,
         short_code=code,
         expires_at=expires_at

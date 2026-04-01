@@ -10,6 +10,7 @@ def generate_code():
             return code
 
 class ShortURL(models.Model):
+    ip_address = models.GenericIPAddressField(blank=True, null=True)
     original_url = models.URLField()
     short_code = models.CharField(max_length=6, unique=True, db_index=True)
     custom_alias = models.CharField(max_length=20, unique=True, null=True, blank=True)
