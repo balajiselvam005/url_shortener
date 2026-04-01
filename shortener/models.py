@@ -13,7 +13,6 @@ class ShortURL(models.Model):
     ip_address = models.GenericIPAddressField(blank=True, null=True)
     original_url = models.URLField()
     short_code = models.CharField(max_length=6, unique=True, db_index=True)
-    custom_alias = models.CharField(max_length=20, unique=True, null=True, blank=True)
     created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     is_active = models.BooleanField(default=True)

@@ -40,7 +40,7 @@ def home(request):
     return render(request, "home.html", {"short_url": short_url, "error": error})
 
 def redirect_view(request, code):
-    obj = get_object_or_404(ShortURL, Q(short_code=code) | Q(custom_alias=code))
+    obj = get_object_or_404(ShortURL, short_code=code)
 
     if not obj.is_active:
         return Http404("The link is inactive")
