@@ -40,7 +40,6 @@ INSTALLED_APPS = [
 
     'shortener',
     'analytics',
-    'api',
 ]
 
 MIDDLEWARE = [
