@@ -2,122 +2,145 @@
 
 {% load static %}
 
-
 {% block content %}
 
-    <h2>Analytics for {{ url.short_code }}</h2>
+<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:32px; flex-wrap:wrap; gap:12px;">
+    <div>
+        <p style="font-size:11px; font-family:'Syne',sans-serif; font-weight:700; text-transform:uppercase; letter-spacing:0.12em; color:var(--text-dim); margin-bottom:6px;">
+            Analytics
+        </p>
+        <h2 style="margin-bottom:0; font-size:26px;">
+            /{{ url.short_code }}
+        </h2>
+    </div>
+    <a href="/dashboard/" style="border:1px solid var(--border); padding:8px 16px; border-radius:8px; color:var(--text-muted); font-size:13px; font-weight:500;">
+        ← Back to Dashboard
+    </a>
+</div>
 
-    <div class="card total-card">
-        <p>Total Clicks</p>
-        <h1>{{ total_clicks }}</h1>
+<div class="card total-card">
+    <p>Total Clicks</p>
+    <h1>{{ total_clicks }}</h1>
+</div>
+
+<div class="chart-grid">
+    <div class="chart-container">
+        <h3>Clicks per day — last 30 days</h3>
+        <canvas id="clickChart"></canvas>
     </div>
 
-    <div class="chart-grid">
-
-        <div class="chart-container">
-            <h3>Clicks Per Day</h3>
-            <canvas id="clickChart"></canvas>
-        </div>
-
-        <div class="chart-container">
-            <h3>Top Referers</h3>
-            <canvas id="refererChart"></canvas>
-        </div>
-
+    <div class="chart-container">
+        <h3>Top Referers</h3>
+        <canvas id="refererChart"></canvas>
     </div>
+</div>
 
-    <div class="card">
-        <h3>Recent Clicks</h3>
-    
-        <table border="1">
-            <tr>
-                <th>Time</th>
-                <th>IP</th>
-                <th>Referer</th>
-            </tr>
-    
-            {% for click in recent_clicks %}
-            <tr>
-                <td>{{ click.clicked_at }}</td>
-                <td>{{ click.ip_address }}</td>
-                <td>{{ click.referer|default:"Direct" }}</td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="3">No recent clicks</td>
-            </tr>
-        {% endfor %}
+<!-- Recent Clicks Table -->
+<div class="card" style="padding:0; overflow:hidden;">
+    <div style="padding:20px 24px 16px; border-bottom:1px solid var(--border);">
+        <h3 style="margin-bottom:0;">Recent Clicks</h3>
+    </div>
+    <div style="overflow-x:auto;">
+        <table>
+            <thead>
+                <tr>
+                    <th>Time</th>
+                    <th>IP Address</th>
+                    <th>Country</th>
+                    <th>Referer</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for click in recent_clicks %}
+                <tr>
+                    <td style="color:var(--text-muted); white-space:nowrap;">{{ click.clicked_at|date:"M d, Y  H:i" }}</td>
+                    <td style="font-family:'Syne',sans-serif; font-size:13px;">{{ click.ip_address }}</td>
+                    <td style="color:var(--text-muted); font-size:13px;">{{ click.country|default:"—" }}</td>
+                    <td style="color:var(--text-muted); font-size:13px; max-width:220px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+                        {{ click.referer|default:"Direct" }}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4" style="text-align:center; padding:32px; color:var(--text-dim);">No clicks recorded yet.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
         </table>
     </div>
+</div>
 
+<script src="{% static 'js/chart.js' %}"></script>
 
-    <script src="{% static 'js/chart.js' %}"></script>
+<script>
+    const clicksData = {{ clicks_per_day|safe }};
+    const clickLabels = clicksData.map(item => item.day.split("T")[0]);
+    const clickCounts = clicksData.map(item => item.count);
 
-    <script>
-        const clicksData = {{ clicks_per_day|safe }};
-        const clickLabels = clicksData.map(item => item.day.split("T")[0]);
-        const clickCounts = clicksData.map(item => item.count);
-
-        new Chart(document.getElementById('clickChart'), {
-            type: 'bar',
-            data: {
-                labels: clickLabels,
-                datasets: [{
-                    label: 'Clicks per day',
-                    data: clickCounts,
-                    backgroundColor: '#3D737F'
-                }]
+    new Chart(document.getElementById('clickChart'), {
+        type: 'bar',
+        data: {
+            labels: clickLabels,
+            datasets: [{
+                label: 'Clicks',
+                data: clickCounts,
+                backgroundColor: 'rgba(61,115,127,0.7)',
+                borderColor: '#3D737F',
+                borderWidth: 1,
+                borderRadius: 4,
+                borderSkipped: false,
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { labels: { color: '#7AADB5', font: { family: 'DM Sans' } } }
             },
-            options: {
-                plugins: {
-                    legend: {
-                        labels: {
-                            color: '#E6F1F3'
-                        }
-                    }
+            scales: {
+                x: {
+                    ticks: { color: '#7AADB5', font: { family: 'DM Sans', size: 11 } },
+                    grid: { color: '#1a3a42' }
                 },
-                scales: {
-                    x: {
-                        ticks: { color: '#E6F1F3' },
-                        grid: { color: '#1f3a40' }
-                    },
-                    y: {
-                        ticks: { color: '#E6F1F3' },
-                        grid: { color: '#1f3a40' }
+                y: {
+                    ticks: { color: '#7AADB5', font: { family: 'DM Sans', size: 11 } },
+                    grid: { color: '#1a3a42' },
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+    const refererData = {{ top_referers|safe }};
+    const refererLabels = refererData.map(item => item.referer || "Direct");
+    const refererCounts = refererData.map(item => item.count);
+
+    new Chart(document.getElementById('refererChart'), {
+        type: 'doughnut',
+        data: {
+            labels: refererLabels,
+            datasets: [{
+                data: refererCounts,
+                backgroundColor: ['#3D737F','#5AA9A6','#7FC8A9','#A1E3D8','#2a5a66'],
+                borderColor: '#07161B',
+                borderWidth: 2,
+                hoverOffset: 6
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        color: '#7AADB5',
+                        font: { family: 'DM Sans', size: 12 },
+                        padding: 16,
+                        usePointStyle: true
                     }
                 }
             }
-        });
+        }
+    });
+</script>
 
-        const refererData = {{ top_referers|safe }};
-        const refererLabels = refererData.map(item => item.referer || "Direct");
-        const refererCounts = refererData.map(item => item.count);
-
-        new Chart(document.getElementById('refererChart'), {
-            type: 'pie',
-            data: {
-                labels: refererLabels,
-                datasets: [{
-                    data: refererCounts,
-                    backgroundColor: [
-                        '#3D737F',
-                        '#5AA9A6',
-                        '#7FC8A9',
-                        '#A1E3D8'
-                    ]
-                }]
-            },
-            options: {
-                plugins: {
-                    legend: {
-                        labels: {
-                            color: '#E6F1F3'
-                        }
-                    }
-                }
-            }
-        });
-    </script>
-    
 {% endblock %}
-    

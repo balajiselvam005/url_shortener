@@ -13,6 +13,7 @@ class ShortURL(models.Model):
     ip_address = models.GenericIPAddressField(blank=True, null=True)
     original_url = models.URLField()
     short_code = models.CharField(max_length=6, unique=True, db_index=True)
+    custom_alias = models.CharField(max_length=10, unique=True, null=True, blank=True)
     created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     is_active = models.BooleanField(default=True)
@@ -20,7 +21,9 @@ class ShortURL(models.Model):
     click_count = models.PositiveIntegerField(default=0)
 
     def save(self, *args, **kwargs):
-        if not self.short_code:
+        if self.custom_alias:
+            self.short_code = self.custom_alias
+        elif not self.short_code:
             self.short_code = generate_code()
         super().save(*args, **kwargs)
 

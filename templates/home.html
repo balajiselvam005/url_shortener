@@ -1,23 +1,53 @@
 {% extends 'base.html' %}
 
-
 {% block content %}
 
-    <div class="card">
-        <h2>URL Shortener</h2>
+<div style="max-width: 640px; margin: 0 auto; padding-top: 24px;">
 
+    <div style="text-align:center; margin-bottom: 40px;">
+        <h1 style="font-size:42px; font-weight:800; letter-spacing:-0.04em; margin-bottom:10px;">
+            Shorten any URL
+        </h1>
+        <p style="color: var(--text-muted); font-size:15px;">
+            Paste a long link, get a clean short one. Track every click.
+        </p>
+    </div>
+
+    <div class="card">
         <form method="POST">
             {% csrf_token %}
-            <input type="url" name="url" placeholder="Enter URL" required>
-            <input type="text" name="custom_alias" placeholder="Custom alias (optional)">
-            <button type="submit">Shorten</button>
+
+            <div class="form-row" style="flex-direction: column;">
+
+                <div class="input-group">
+                    <label>Long URL</label>
+                    <input type="url" name="url" placeholder="https://example.com/very/long/url" required>
+                </div>
+
+                <div class="input-group">
+                    <label>Custom Alias <span style="color:var(--text-dim); font-weight:400; text-transform:none; letter-spacing:0;">(optional, max 6 chars)</span></label>
+                    <input type="text" name="custom_alias" placeholder="e.g. mylink" maxlength="6">
+                </div>
+
+                <div style="padding-top: 4px;">
+                    <button type="submit">⚡ Shorten URL</button>
+                </div>
+
+            </div>
         </form>
 
-
         {% if short_url %}
-            <p>Short URL: <a href="{{ short_url }}">{{ short_url }}</a></p>
+            <div class="short-url-result">
+                <span>Your link →</span>
+                <a href="{{ short_url }}" target="_blank">{{ short_url }}</a>
+            </div>
+        {% endif %}
+
+        {% if error %}
+            <div class="error-msg">⚠ {{ error }}</div>
         {% endif %}
     </div>
 
+</div>
+
 {% endblock %}
-    

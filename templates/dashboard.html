@@ -1,69 +1,100 @@
 {% extends 'base.html' %}
 
-
 {% block content %}
 
-    <h2>Dashboard</h2>
+<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:28px; flex-wrap:wrap; gap:12px;">
+    <h2 style="margin-bottom:0;">My URLs</h2>
+    <span style="font-size:13px; color:var(--text-dim); font-family:'Syne',sans-serif;">
+        {{ urls|length }} link{{ urls|length|pluralize }}
+    </span>
+</div>
 
-    <div class="card">
-        <form method="POST">
-            {% csrf_token %}
-            <table border='1'>
-                <tr>
-                    <th>Select</th>
-                    <th>Short Code</th>
-                    <th>Original URL</th>
-                    <th>Clicks</th>
-                    <th>Created</th>
-                    <th>Status</th>
-                    <th>Action</th>
-                    <th>QR</th>
-                    <th>Analytics</th>
-                </tr>
+<div class="card" style="padding: 0; overflow: hidden;">
+    <form method="POST">
+        {% csrf_token %}
 
-            
-                {% for url in urls %}
+        <div style="overflow-x: auto;">
+            <table>
+                <thead>
                     <tr>
-                        <td><input type="checkbox" name="selected_urls" value="{{url.id}}"></td>
-                        <td><a href="/s/{{ url.short_code }}/">{{ url.short_code }}</a></td>
-                        <td>{{ url.original_url }}</td>
-                        <td>{{ url.click_count }}</td>
-                        <td>{{ url.created_at }}</td>
-                        <td>
-                            
-                            {% if url.is_active %}
-                                Active
-                            {% else %}
-                                Inactive
-                            {% endif %}
-                                
+                        <th style="width:40px;"></th>
+                        <th>Short Code</th>
+                        <th>Original URL</th>
+                        <th>Clicks</th>
+                        <th>Created</th>
+                        <th>Expires</th>
+                        <th>Status</th>
+                        <th>Toggle</th>
+                        <th>QR</th>
+                        <th>Analytics</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for url in urls %}
+                    <tr>
+                        <td style="text-align:center;">
+                            <input type="checkbox" name="selected_urls" value="{{ url.id }}">
                         </td>
                         <td>
-                            <a href="/toggle/{{url.id}}">
-                                
-                                {% if url.is_active %}
-                                    Deactivate
-                                {% else %}
-                                    Activate
-                                {% endif %}
+                            <a href="/s/{{ url.short_code }}/" style="font-family:'Syne',sans-serif; font-weight:700; font-size:13px; color:var(--accent-2); border:none; padding:0; background:none;">
+                                {{ url.short_code }}
+                            </a>
+                        </td>
+                        <td style="max-width:260px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:var(--text-muted); font-size:13px;">
+                            {{ url.original_url }}
+                        </td>
+                        <td style="font-family:'Syne',sans-serif; font-weight:700; color:var(--accent-2);">
+                            {{ url.click_count }}
+                        </td>
+                        <td style="color:var(--text-muted); font-size:13px; white-space:nowrap;">
+                            {{ url.created_at|date:"M d, Y" }}
+                        </td>
+                        <td style="color:var(--text-dim); font-size:13px;">
+                            {% if url.expires_at %}
+                                {{ url.expires_at|date:"M d, Y" }}
+                            {% else %}
+                                <span style="color:var(--text-dim);">—</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if url.is_active %}
+                                <span class="badge badge-active">Active</span>
+                            {% else %}
+                                <span class="badge badge-inactive">Inactive</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <a href="/toggle/{{ url.id }}/">
+                                {% if url.is_active %}Deactivate{% else %}Activate{% endif %}
                             </a>
                         </td>
                         <td>
-                            <a href="/qr/{{ url.short_code }}/" target="_blank">QR</a>
+                            <a href="/qr/{{ url.short_code }}/" target="_blank">QR Code</a>
                         </td>
                         <td>
-                            <a href="/dashboard/{{ url.short_code }}/analytics/">View</a>
+                            <a href="/dashboard/{{ url.short_code }}/analytics/">Analytics</a>
                         </td>
                     </tr>
-                {% endfor %}
-                
+                    {% empty %}
+                    <tr>
+                        <td colspan="10" style="text-align:center; padding:40px; color:var(--text-dim);">
+                            No URLs yet. <a href="/" style="border:none; padding:0;">Shorten your first one →</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
             </table>
+        </div>
 
-            <br>
+        {% if urls %}
+        <div style="padding: 16px 20px; border-top: 1px solid var(--border); display:flex; justify-content:flex-end;">
+            <button type="submit" class="btn-danger">
+                🗑 Delete Selected
+            </button>
+        </div>
+        {% endif %}
 
-            <button type="submit">Delete Selected</button>
-        </form>
-    </div>
+    </form>
+</div>
 
 {% endblock %}
-    

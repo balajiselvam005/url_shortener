@@ -10,6 +10,10 @@ from django.utils.timezone import timedelta, now
 from django.db.models.functions import TruncDay
 from django.db.models import Count
 
+
+# Dashboard and analytics use @login_required decorator.
+# For global restriction of protected auth, see shortener/middleware.py — LoginRequiredMiddleware.
+# Decorator is preferred here since most app URLs are public.
 @login_required
 def dashboard(request):
     if request.method == "POST":

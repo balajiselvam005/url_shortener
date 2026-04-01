@@ -1,43 +1,43 @@
 import json
 import qrcode
+import logging
 
-from django.http import JsonResponse, HttpResponse
+from shortener.forms import ShortenForm
+from shortener.serializers import ShortenSerializer
+logger = logging.getLogger(__name__)
+
+from django.http import JsonResponse, HttpResponse, HttpResponseRedirect
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.timezone import now, timedelta
 from django.utils import timezone
 
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from django.http import Http404
+from django.http import Http404, HttpResponseGone
 from django.db.models import F, Q
 from analytics.models import Click
 from .models import ShortURL, generate_code
 
 def home(request):
     short_url = None
-    error = None
+    form = ShortenForm()
     
     if request.method == "POST":
-        try:
-            original_url = request.POST.get("url")
-            custom_alias = request.POST.get("custom_alias")
+        form = ShortenForm(request.POST)
+        if form.is_valid():
+            original_url = form.cleaned_data["url"]
+            custom_alias = form.cleaned_data.get("custom_alias")
 
-            if not original_url:
-                error = "URL is required"
+            ip = request.META.get("REMOTE_ADDR")
+            obj = ShortURL.objects.create(
+                ip_address = ip,
+                original_url = original_url,
+                custom_alias = custom_alias,
+                created_by = request.user if request.user.is_authenticated else None
+            )
+            short_url = request.build_absolute_uri(f"/s/{obj.short_code}")
 
-            elif custom_alias and ShortURL.objects.filter(short_code=custom_alias).exists():
-                error = "Custom alias already exists"
-
-            else:
-                ip = request.META.get("REMOTE_ADDR")
-                obj = ShortURL.objects.create(ip_address=ip, original_url=original_url, short_code=custom_alias if custom_alias else None, created_by=request.user if request.user.is_authenticated else None)
-            
-                short_url = request.build_absolute_uri(f"/s/{obj.short_code}/")
-
-        except Exception as e:
-            error = "Something went wrong"
-
-    return render(request, "home.html", {"short_url": short_url, "error": error})
+    return render(request, "home.html", {"form": form, "short_url": short_url})
 
 def redirect_view(request, code):
     obj = get_object_or_404(ShortURL, short_code=code)
@@ -46,7 +46,7 @@ def redirect_view(request, code):
         return Http404("The link is inactive")
     
     if obj.expires_at and obj.expires_at < timezone.now():
-        return Http404("The link has expired")
+        return HttpResponseGone("The link has expired")
     
     try:
     
@@ -60,10 +60,10 @@ def redirect_view(request, code):
             country = "India"
         )
     
-    except:
-        pass
+    except Exception as e :
+        logger.error(f"Click logging failed for {code} : {e}")
 
-    return redirect(obj.original_url)
+    return HttpResponseRedirect(obj.original_url)
 
 def generate_qr(request, code):
     try:
@@ -85,7 +85,7 @@ def api_shorten(request):
 
     try:
         data = json.loads(request.body)
-    except:
+    except json.JSONDecodeError:
         return JsonResponse({"error": "Invalid JSON"}, status=400)
     
     ip = request.META.get("REMOTE_ADDR")
@@ -93,34 +93,30 @@ def api_shorten(request):
     count = ShortURL.objects.filter(ip_address=ip , created_at__gte=last_hour).count()
     if count >= 10:
         return JsonResponse({"error": "Rate Limit Exceeded"}, status=429)
-
-    url = data.get("url")
-    custom_alias = data.get("custom_alias")
-    expires_days = data.get("expires_in_days")
-
-    if not url:
-        return JsonResponse({"error": "URL required"}, status=400)
-
-    if custom_alias:
-        if ShortURL.objects.filter(short_code=custom_alias).exists():
-            return JsonResponse({"error": "Alias exists"}, status=400)
-        code = custom_alias
-    else:
-        code = generate_code()
+    
+    serializer = ShortenSerializer(data = data)
+    if not serializer.is_valid():
+        return JsonResponse({"error": serializer.errors}, status=400)
+    
+    validated = serializer.validated_data
+    url = validated["url"]
+    custom_alias = validated.get("custom_alias", "")
+    expires_days = validated.get("expires_in_days")
 
     expires_at = None
+
     if expires_days:
-        expires_at = now() + timedelta(days=int(expires_days))
+        expires_at = now() + timedelta(days=expires_days)   
 
     obj = ShortURL.objects.create(  
         ip_address=ip,
         original_url=url,
-        short_code=code,
+        custom_alias=custom_alias if custom_alias else None,
         expires_at=expires_at
     )
 
     return JsonResponse({
-        "short_url": f"http://127.0.0.1:8000/s/{obj.short_code}/",
+        "short_url": request.build_absolute_uri(f"/s/{obj.short_code}/"),
         "short_code": obj.short_code,
         "expires_at": str(obj.expires_at)
     })
