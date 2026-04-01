@@ -1,5 +1,7 @@
 import json
-from django.http import JsonResponse
+import qrcode
+
+from django.http import JsonResponse, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.timezone import now, timedelta
 from django.utils import timezone
@@ -7,7 +9,7 @@ from django.utils import timezone
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseGone
-from django.db.models import F
+from django.db.models import F, Q
 from analytics.models import Click
 from .models import ShortURL, generate_code
 
@@ -24,7 +26,7 @@ def home(request):
     return render(request, "home.html", {"short_url": short_url})
 
 def redirect_view(request, code):
-    obj = get_object_or_404(ShortURL, short_code=code)
+    obj = get_object_or_404(ShortURL, Q(short_code=code) | Q(custom_alias=code))
 
     if not obj.is_active:
         return HttpResponseGone("The link is inactive")
@@ -38,11 +40,19 @@ def redirect_view(request, code):
         short_url = obj,
         ip_address = request.META.get("REMOTE_ADDR"),
         user_agent = request.META.get("HTTP_USER_AGENT"),
-        referer = request.META.get("HTTP_REFERER"),
+        referer = request.META.get("HTTP_REFERER") or "",
         country = "India"
     )
 
     return redirect(obj.original_url)
+
+def generate_qr(request, code):
+    obj = get_object_or_404(ShortURL, short_code=code)
+    url = request.build_absolute_uri(f"/s/{obj.short_code}")
+    qr = qrcode.make(url)
+    response = HttpResponse(content_type="image/png")
+    qr.save(response, "PNG")
+    return response
 
 @csrf_exempt
 def api_shorten(request):

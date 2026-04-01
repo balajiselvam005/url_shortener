@@ -17,6 +17,7 @@
                     <th>Created</th>
                     <th>Status</th>
                     <th>Action</th>
+                    <th>QR</th>
                     <th>Analytics</th>
                 </tr>
 
@@ -46,6 +47,9 @@
                                     Activate
                                 {% endif %}
                             </a>
+                        </td>
+                        <td>
+                            <a href="/qr/{{ url.short_code }}/" target="_blank">QR</a>
                         </td>
                         <td>
                             <a href="/dashboard/{{ url.short_code }}/analytics/">View</a>
