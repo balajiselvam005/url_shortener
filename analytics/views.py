@@ -1,3 +1,5 @@
+import csv
+import io
 import json
 
 from django.shortcuts import render
@@ -62,3 +64,62 @@ def analytics_view(request, code):
         "top_referers": json.dumps(list(top_referers)),
         "recent_clicks": recent_clicks
     })
+
+
+@login_required
+def bulk_import(request):
+    results = []
+
+    if request.method == "POST":
+        csv_file = request.FILES.get("csv_file")
+
+        if not csv_file:
+            return render(request, "bulk_import.html", {"error": "No file uploaded"})
+
+        if not csv_file.name.endswith(".csv"):
+            return render(request, "bulk_import.html", {"error": "File must be a .csv"})
+
+        decoded_file = csv_file.read().decode('utf-8').splitlines()
+        reader = csv.DictReader(decoded_file)
+
+        for row in reader:
+            original_url = row.get("url", "").strip()
+            custom_alias = row.get("custom_alias", "").strip()
+            expires_in_days = row.get("expires_in_days", "").strip()
+
+            if not original_url:
+                results.append({"url": "—", "status": "Skipped — no URL"})
+                continue
+
+            # handle expiry
+            expires_at = None
+            if expires_in_days:
+                try:
+                    expires_at = now() + timedelta(days=int(expires_in_days))
+                except ValueError:
+                    results.append({"url": original_url, "status": "Skipped — invalid expires_in_days"})
+                    continue
+
+            # handle custom alias collision
+            if custom_alias:
+                if ShortURL.objects.filter(short_code=custom_alias).exists():
+                    results.append({"url": original_url, "status": f"Alias '{custom_alias}' already taken"})
+                    continue
+
+            try:
+                obj = ShortURL.objects.create(
+                    original_url=original_url,
+                    custom_alias=custom_alias if custom_alias else None,
+                    expires_at=expires_at,
+                    created_by=request.user,
+                    ip_address=request.META.get("REMOTE_ADDR")
+                )
+                results.append({
+                    "url": original_url,
+                    "status": f"Created — /s/{obj.short_code}/"
+                })
+
+            except Exception as e:
+                results.append({"url": original_url, "status": f"Error — {e}"})
+
+    return render(request, "bulk_import.html", {"results": results})

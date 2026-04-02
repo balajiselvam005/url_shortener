@@ -17,7 +17,7 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from django.contrib.auth import views as auth_views
-from analytics.views import dashboard, analytics_view
+from analytics.views import bulk_import, dashboard, analytics_view
 from shortener.views import home, redirect_view, toggle_url, api_shorten, generate_qr
 
 urlpatterns = [
@@ -25,6 +25,7 @@ urlpatterns = [
     path('', home),
     path('s/<str:code>/', redirect_view),
     path('dashboard/', dashboard),
+    path('dashboard/bulk-import/', bulk_import),
     path('toggle/<int:id>/', toggle_url),
     path('dashboard/<str:code>/analytics/', analytics_view),
     path('api/shorten/', api_shorten),

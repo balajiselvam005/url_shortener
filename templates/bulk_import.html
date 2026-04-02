@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div style="max-width:640px; margin: 0 auto;">
+
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:28px;">
+        <h2 style="margin-bottom:0;">Bulk Import URLs</h2>
+        <a href="/dashboard/" style="border:1px solid var(--border); padding:8px 16px;
+           border-radius:8px; color:var(--text-muted); font-size:13px;">
+            ← Back to Dashboard
+        </a>
+    </div>
+
+    <div class="card">
+        <h3>CSV Format</h3>
+        <p style="font-size:13px; margin-bottom:16px;">
+            Required column: <code style="background:var(--bg-2); padding:2px 6px; border-radius:4px; color:var(--accent-2);">url</code> —
+            Optional: <code style="background:var(--bg-2); padding:2px 6px; border-radius:4px; color:var(--accent-2);">custom_alias</code>,
+            <code style="background:var(--bg-2); padding:2px 6px; border-radius:4px; color:var(--accent-2);">expires_in_days</code>
+        </p>
+        <pre style="background:var(--bg-2); padding:14px; border-radius:8px; font-size:12px;
+             color:var(--text-muted); overflow-x:auto; line-height:1.7;">url,custom_alias,expires_in_days
+https://google.com,goog,30
+https://github.com,,
+https://openai.com,oai,7</pre>
+    </div>
+
+    <div class="card">
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="input-group" style="margin-bottom:18px;">
+                <label>Upload CSV File</label>
+                <input type="file" name="csv_file" accept=".csv"
+                       style="padding:10px; cursor:pointer; color:var(--text-muted);">
+            </div>
+            <button type="submit">⬆ Import URLs</button>
+        </form>
+    </div>
+
+    {% if results %}
+    <div class="card" style="padding:0; overflow:hidden;">
+        <div style="padding:16px 24px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center;">
+            <h3 style="margin-bottom:0;">Import Results</h3>
+            <span style="font-size:12px; color:var(--text-dim); font-family:'Syne',sans-serif;">
+                {{ results|length }} row{{ results|length|pluralize }}
+            </span>
+        </div>
+        <div style="overflow-x:auto;">
+            <table>
+                <thead>
+                    <tr>
+                        <th>URL</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for r in results %}
+                    <tr>
+                        <td style="font-size:13px; color:var(--text-muted); max-width:300px;
+                            overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+                            {{ r.url }}
+                        </td>
+                        <td style="font-size:13px;">{{ r.status }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endif %}
+
+</div>
+
+{% endblock %}

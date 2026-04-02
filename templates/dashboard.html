@@ -3,10 +3,20 @@
 {% block content %}
 
 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:28px; flex-wrap:wrap; gap:12px;">
-    <h2 style="margin-bottom:0;">My URLs</h2>
-    <span style="font-size:13px; color:var(--text-dim); font-family:'Syne',sans-serif;">
-        {{ urls|length }} link{{ urls|length|pluralize }}
-    </span>
+    <div>
+        <h2 style="margin-bottom:4px;">My URLs</h2>
+        <span style="font-size:13px; color:var(--text-dim); font-family:'Syne',sans-serif;">
+            {{ urls|length }} link{{ urls|length|pluralize }}
+        </span>
+    </div>
+    <a href="/dashboard/bulk-import/"
+       style="border:1px solid var(--border); padding:9px 18px; border-radius:8px;
+              color:var(--text-muted); font-size:13px; font-weight:500;
+              transition: border-color 0.22s ease, color 0.22s ease; display:inline-block;"
+       onmouseover="this.style.borderColor='var(--border-h)'; this.style.color='var(--text)'"
+       onmouseout="this.style.borderColor='var(--border)'; this.style.color='var(--text-muted)'">
+        ⬆ Bulk Import
+    </a>
 </div>
 
 <div class="card" style="padding: 0; overflow: hidden;">
