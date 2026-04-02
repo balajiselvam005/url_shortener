@@ -21,12 +21,22 @@ class ShortURL(models.Model):
     click_count = models.PositiveIntegerField(default=0)
 
     def save(self, *args, **kwargs):
+
         if self.custom_alias:
-            if ShortURL.objects.filter(short_code=self.custom_alias).exists():
+            existing = ShortURL.objects.filter(short_code=self.custom_alias)
+
+            # Exclude current object (IMPORTANT)
+            if self.pk:
+                existing = existing.exclude(pk=self.pk)
+
+            if existing.exists():
                 raise ValueError("Alias already exists")
+
             self.short_code = self.custom_alias
+
         elif not self.short_code:
             self.short_code = generate_code()
+
         super().save(*args, **kwargs)
 
     def __str__(self):
