@@ -5,35 +5,45 @@
 <div style="max-width: 640px; margin: 0 auto; padding-top: 24px;">
 
     <div style="text-align:center; margin-bottom: 40px;">
-        <h1 style="font-size:42px; font-weight:800; letter-spacing:-0.04em; margin-bottom:14px;">
+        <h1 style="font-size:42px; font-weight:800; letter-spacing:-0.02em; margin-bottom:16px;">
             Shorten any URL
         </h1>
         <p style="color: var(--text-muted); font-size:15px;">
-            Paste a long link, get a clean short one. Track every click.
+            Enter a URL to generate a short link and track its usage.
         </p>
     </div>
 
-    <div class="card">
+    <div class="card" style="padding:36px 40px;">
+
         <form method="POST">
             {% csrf_token %}
 
-            <div class="form-row" style="flex-direction: column; gap:16px;">
+            <div style="display:flex; gap:10px; align-items:center; margin-bottom:16px;">
 
-                <div class="input-group">
-                    <label>Long URL</label>
-                    <input type="url" name="url" placeholder="https://example.com/very/long/url" required>
-                </div>
+                <input type="url" name="url"
+                    placeholder="https://example.com/very/long/url"
+                    required
+                    style="flex:1; height:44px; font-size:14px;">
 
-                <div class="input-group">
-                    <label>Custom Alias <span style="color:var(--text-dim); font-weight:400; text-transform:none; letter-spacing:0;">(optional, max 6 chars)</span></label>
-                    <input type="text" name="custom_alias" placeholder="e.g. mylink" maxlength="6">
-                </div>
-
-                <div style="padding-top: 6px; display:flex; justify-content:flex-end;">
-                    <button type="submit">⚡ Shorten URL</button>
-                </div>
+                <button type="submit" style="height:44px; padding:0 20px;">
+                    ⚡ Shorten
+                </button>
 
             </div>
+
+            <div class="input-group" style="max-width:260px;">
+                <label>
+                    Custom Alias
+                    <span style="color:var(--text-dim); font-weight:400; text-transform:none; letter-spacing:0;">
+                        (optional)
+                    </span>
+                </label>
+
+                <input type="text" name="custom_alias"
+                    placeholder="e.g. mylink"
+                    maxlength="6">
+            </div>
+
         </form>
 
         {% if short_url %}
@@ -52,16 +62,16 @@
 
 <div style="max-width: 900px; margin: 48px auto 0; padding-bottom: 48px;">
 
-    <p style="text-align:center; font-size:11px; font-family:'Syne',sans-serif; font-weight:700;
+    <p style="text-align:center; font-size:11px; font-family:inherit; font-weight:700;
               text-transform:uppercase; letter-spacing:0.14em; color:var(--text-dim); margin-bottom:32px;">
-        Everything you need
+        Features
     </p>
 
     <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:16px;">
 
         <div class="card" style="text-align:center; padding:28px 20px; margin-bottom:0;">
             <div style="font-size:28px; margin-bottom:14px;">⚡</div>
-            <h3 style="color:var(--text); margin-bottom:8px; font-size:14px;">Instant Shortening</h3>
+            <h3 style="color:var(--text); margin-bottom:8px; font-size:14px;">Quick URL shortening</h3>
             <p style="font-size:13px; line-height:1.6;">
                 Paste any URL and get a clean 6-character short link in milliseconds.
             </p>

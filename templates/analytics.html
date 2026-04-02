@@ -6,7 +6,7 @@
 
 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:32px; flex-wrap:wrap; gap:12px;">
     <div>
-        <p style="font-size:11px; font-family:'Syne',sans-serif; font-weight:700; text-transform:uppercase; letter-spacing:0.12em; color:var(--text-dim); margin-bottom:6px;">
+        <p style="font-size:11px; font-family:inherit; font-weight:700; text-transform:uppercase; letter-spacing:0.12em; color:var(--text-dim); margin-bottom:6px;">
             Analytics
         </p>
         <h2 style="margin-bottom:0; font-size:26px;">
@@ -53,7 +53,7 @@
                 {% for click in recent_clicks %}
                 <tr>
                     <td style="color:var(--text-muted); white-space:nowrap;">{{ click.clicked_at|date:"M d, Y  H:i" }}</td>
-                    <td style="font-family:'Syne',sans-serif; font-size:13px;">{{ click.ip_address }}</td>
+                    <td style="font-family:inherit; font-size:13px;">{{ click.ip_address }}</td>
                     <td style="color:var(--text-muted); font-size:13px;">{{ click.country|default:"—" }}</td>
                     <td style="color:var(--text-muted); font-size:13px; max-width:220px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
                         {{ click.referer|default:"Direct" }}
@@ -93,15 +93,15 @@
         options: {
             responsive: true,
             plugins: {
-                legend: { labels: { color: '#7AADB5', font: { family: 'DM Sans' } } }
+                legend: { labels: { color: '#7AADB5', font: { family: 'system-ui' } } }
             },
             scales: {
                 x: {
-                    ticks: { color: '#7AADB5', font: { family: 'DM Sans', size: 11 } },
+                    ticks: { color: '#7AADB5', font: { family: 'system-ui', size: 11 } },
                     grid: { color: '#1a3a42' }
                 },
                 y: {
-                    ticks: { color: '#7AADB5', font: { family: 'DM Sans', size: 11 } },
+                    ticks: { color: '#7AADB5', font: { family: 'system-ui', size: 11 } },
                     grid: { color: '#1a3a42' },
                     beginAtZero: true
                 }
@@ -132,7 +132,7 @@
                     position: 'bottom',
                     labels: {
                         color: '#7AADB5',
-                        font: { family: 'DM Sans', size: 12 },
+                        font: { family: 'system-ui', size: 12 },
                         padding: 16,
                         usePointStyle: true
                     }

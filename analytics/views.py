@@ -1,5 +1,4 @@
 import csv
-import io
 import json
 
 from django.shortcuts import render
@@ -13,14 +12,15 @@ from django.db.models.functions import TruncDay
 from django.db.models import Count
 
 
-# Dashboard and analytics use @login_required decorator.
-# For global restriction of protected auth, see shortener/middleware.py — LoginRequiredMiddleware.
+# dashboard and analytics are protected views
+# public routes are handled via middleware
 # Decorator is preferred here since most app URLs are public.
 @login_required
 def dashboard(request):
     if request.method == "POST":
         ids = request.POST.getlist("selected_urls")
-        ShortURL.objects.filter(id__in=ids, created_by=request.user).delete()
+        if ids:
+            ShortURL.objects.filter(id__in=ids, created_by=request.user).delete()
 
     urls = ShortURL.objects.filter(created_by=request.user)
 
@@ -91,16 +91,14 @@ def bulk_import(request):
                 results.append({"url": "—", "status": "Skipped — no URL"})
                 continue
 
-            # handle expiry
             expires_at = None
             if expires_in_days:
                 try:
                     expires_at = now() + timedelta(days=int(expires_in_days))
                 except ValueError:
-                    results.append({"url": original_url, "status": "Skipped — invalid expires_in_days"})
+                    results.append({"url": original_url, "status": "Skipped — invalid expiry value"})
                     continue
 
-            # handle custom alias collision
             if custom_alias:
                 if ShortURL.objects.filter(short_code=custom_alias).exists():
                     results.append({"url": original_url, "status": f"Alias '{custom_alias}' already taken"})
@@ -116,10 +114,10 @@ def bulk_import(request):
                 )
                 results.append({
                     "url": original_url,
-                    "status": f"Created — /s/{obj.short_code}/"
+                    "status": f"Created: /s/{obj.short_code}/"
                 })
 
             except Exception as e:
-                results.append({"url": original_url, "status": f"Error — {e}"})
+                results.append({"url": original_url, "status": f"Error — {str(e)}"})
 
     return render(request, "bulk_import.html", {"results": results})

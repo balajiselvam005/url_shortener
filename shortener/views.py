@@ -43,10 +43,10 @@ def redirect_view(request, code):
     obj = get_object_or_404(ShortURL, short_code=code)
 
     if not obj.is_active:
-        return Http404("The link is inactive")
+        raise Http404("The link is inactive")
     
     if obj.expires_at and obj.expires_at < timezone.now():
-        return HttpResponseGone("The link has expired")
+        raise HttpResponseGone("The link has expired")
     
     try:
     
@@ -61,7 +61,7 @@ def redirect_view(request, code):
         )
     
     except Exception as e :
-        logger.error(f"Click logging failed for {code} : {e}")
+        logger.error(f"Failed to log click for {code}: {e}")
 
     return HttpResponseRedirect(obj.original_url)
 
@@ -92,7 +92,7 @@ def api_shorten(request):
     last_hour = now() - timedelta(hours=1)
     count = ShortURL.objects.filter(ip_address=ip , created_at__gte=last_hour).count()
     if count >= 10:
-        return JsonResponse({"error": "Rate Limit Exceeded"}, status=429)
+        return JsonResponse({"error": "Too many requests. Try again later."}, status=429)
     
     serializer = ShortenSerializer(data = data)
     if not serializer.is_valid():

@@ -28,4 +28,4 @@ class ShortURL(models.Model):
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return self.short_code
+        return f"{self.short_code} → {self.original_url}"

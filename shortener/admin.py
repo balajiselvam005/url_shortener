@@ -7,7 +7,7 @@ def deactivate_urls(modeladmin, request, queryset):
     queryset.update(is_active=False)
 
 @admin.action(description="Activate Selected URLs")
-def deactivate_urls(modeladmin, request, queryset):
+def activate_urls(modeladmin, request, queryset):
     queryset.update(is_active=True)
 
 @admin.register(ShortURL)

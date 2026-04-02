@@ -5,7 +5,7 @@
 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:28px; flex-wrap:wrap; gap:12px;">
     <div>
         <h2 style="margin-bottom:4px;">My URLs</h2>
-        <span style="font-size:13px; color:var(--text-dim); font-family:'Syne',sans-serif;">
+        <span style="font-size:13px; color:var(--text-dim); font-family:inherit;">
             {{ urls|length }} link{{ urls|length|pluralize }}
         </span>
     </div>
@@ -46,14 +46,14 @@
                             <input type="checkbox" name="selected_urls" value="{{ url.id }}">
                         </td>
                         <td>
-                            <a href="/s/{{ url.short_code }}/" style="font-family:'Syne',sans-serif; font-weight:700; font-size:13px; color:var(--accent-2); border:none; padding:0; background:none;">
+                            <a href="/s/{{ url.short_code }}/" style="font-family:inherit; font-weight:700; font-size:13px; color:var(--accent-2); border:none; padding:0; background:none;">
                                 {{ url.short_code }}
                             </a>
                         </td>
                         <td style="max-width:260px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:var(--text-muted); font-size:13px;">
                             {{ url.original_url }}
                         </td>
-                        <td style="font-family:'Syne',sans-serif; font-weight:700; color:var(--accent-2);">
+                        <td style="font-family:inherit; font-weight:700; color:var(--accent-2);">
                             {{ url.click_count }}
                         </td>
                         <td style="color:var(--text-muted); font-size:13px; white-space:nowrap;">
@@ -75,7 +75,7 @@
                         </td>
                         <td>
                             <a href="/toggle/{{ url.id }}/">
-                                {% if url.is_active %}Deactivate{% else %}Activate{% endif %}
+                                {% if url.is_active %}Disable{% else %}Enable{% endif %}
                             </a>
                         </td>
                         <td>

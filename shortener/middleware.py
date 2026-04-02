@@ -15,11 +15,10 @@ def is_exempt(path):
 
 class LoginRequiredMiddleware:
     """
-    Middleware alternative to @login_required decorator.
-    Protects all views globally except whitelisted public URLs.
-    Unlike @login_required which is applied per-view, this middleware
-    enforces auth at the request level before any view is called.
+    Middleware to require login for most routes.
+    Public routes like home, shorten API, and redirects are excluded.
     """
+
     def __init__(self, get_response):
         self.get_response = get_response
 

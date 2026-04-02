@@ -48,6 +48,44 @@
                 background-image: radial-gradient(ellipse 80% 50% at 50% -10%, rgba(61,115,127,0.08) 0%, transparent 70%);
             }
 
+            body.light nav {
+                background: rgba(255, 255, 255, 0.75);
+                box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            }
+
+            body.light .nav-left a,
+                body.light .nav-right a {
+                    color: var(--text);
+            }
+
+            body.light .nav-left a:hover,
+                body.light .nav-right a:hover {
+                    background: var(--surface-2);
+                    color: var(--accent);
+            }
+
+            body.light .nav-left::before {
+                color: var(--accent);
+            }
+
+            body.light button {
+                color: #ffffff;
+            }
+
+            body.light button:hover {
+                color: #ffffff;
+            }
+
+            body.light button.btn-danger {
+                background: #c0444e;
+                color: #ffffff;
+                border: none;
+            }
+
+            body.light button.btn-danger:hover {
+                background: #a73740;
+            }
+
             body, body * {
                 transition: background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease;
             }
@@ -71,7 +109,9 @@
                 text-decoration: none;
                 transition: color var(--transition);
             }
-            a:hover { color: #fff; }
+            a:hover {
+                color: var(--text);
+            }
 
             nav {
                 position: sticky;
@@ -101,7 +141,7 @@
             .nav-left a,
             .nav-right a {
                 font-family: inherit;
-                font-size: 13.5px;
+                font-size: 16px;
                 font-weight: 500;
                 color: var(--text-muted);
                 padding: 6px 14px;
