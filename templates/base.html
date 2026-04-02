@@ -129,12 +129,11 @@
             }
 
             .nav-left::before {
-                content: "⚡ snip";
-                font-family: inherit;
+                content: "Snip.io";
                 font-weight: 800;
                 font-size: 18px;
                 color: var(--accent-2);
-                margin-right: 32px;
+                margin-right: 24px;
                 letter-spacing: -0.5px;
             }
 
@@ -476,6 +475,79 @@
                 font-family: inherit;
             }
 
+            .theme-switch {
+                position: relative;
+                display: inline-block;
+                width: 42px;
+                height: 22px;
+            }
+
+            .theme-switch input {
+                display: none;
+            }
+
+            .slider {
+                position: absolute;
+                cursor: pointer;
+                inset: 0;
+                background: var(--surface-2);
+                border: 1px solid var(--border);
+                border-radius: 999px;
+                transition: background 0.25s ease;
+            }
+
+            .slider::before {
+                content: "";
+                position: absolute;
+                height: 16px;
+                width: 16px;
+                left: 3px;
+                top: 2px;
+                background: var(--accent);
+                border-radius: 50%;
+                transition: transform 0.25s ease;
+            }
+
+            input:checked + .slider::before {
+                transform: translateX(20px);
+            }
+
+            .table-switch {
+                position: relative;
+                display: inline-block;
+                width: 36px;
+                height: 20px;
+            }
+
+            .table-switch input {
+                display: none;
+            }
+
+            .table-switch .slider {
+                position: absolute;
+                inset: 0;
+                background: var(--surface-2);
+                border: 1px solid var(--border);
+                border-radius: 999px;
+                cursor: pointer;
+            }
+
+            .table-switch .slider::before {
+                content: "";
+                position: absolute;
+                width: 14px;
+                height: 14px;
+                left: 2px;
+                top: 2px;
+                background: var(--accent);
+                border-radius: 50%;
+                transition: transform 0.2s ease;
+            }
+
+            .table-switch input:checked + .slider::before {
+                transform: translateX(16px);
+            }
+
             @keyframes fadeUp {
                 from { opacity: 0; transform: translateY(8px); }
                 to   { opacity: 1; transform: translateY(0); }
@@ -509,20 +581,10 @@
 
             <div class="nav-right" style="display:flex; align-items:center; gap:8px;">
 
-                <button onclick="toggleTheme()" id="theme-btn" style="
-                    background: var(--surface-2);
-                    border: 1px solid var(--border);
-                    color: var(--text-muted);
-                    padding: 6px 12px;
-                    font-size: 14px;
-                    border-radius: 6px;
-                    cursor: pointer;
-                    transform: none;
-                    box-shadow: none;
-                    font-family: inherit;
-                    font-weight: 500;
-                    letter-spacing: 0;
-                ">🌙</button>
+                <label class="theme-switch">
+                    <input type="checkbox" id="theme-toggle" onclick="toggleTheme()">
+                    <span class="slider"></span>
+                </label>
 
                 {% if user.is_authenticated %}
                     <form method="POST" action="/logout/" style="display:inline;">
@@ -533,7 +595,7 @@
                             padding: 6px 14px;
                             color: var(--text-muted);
                             font-family: inherit;
-                            font-size: 13.5px;
+                            font-size: 16px;
                             font-weight: 500;
                             border-radius: 6px;
                             cursor: pointer;
@@ -557,15 +619,14 @@
 
         <script>
             const savedTheme = localStorage.getItem('theme');
+
             if (savedTheme === 'light') {
                 document.body.classList.add('light');
-                document.getElementById('theme-btn').textContent = '☀️';
+                document.getElementById('theme-toggle').checked = true;
             }
 
             function toggleTheme() {
                 const isLight = document.body.classList.toggle('light');
-                const btn = document.getElementById('theme-btn');
-                btn.textContent = isLight ? '☀️' : '🌙';
                 localStorage.setItem('theme', isLight ? 'light' : 'dark');
             }
         </script>

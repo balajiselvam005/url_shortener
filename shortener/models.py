@@ -22,6 +22,8 @@ class ShortURL(models.Model):
 
     def save(self, *args, **kwargs):
         if self.custom_alias:
+            if ShortURL.objects.filter(short_code=self.custom_alias).exists():
+                raise ValueError("Alias already exists")
             self.short_code = self.custom_alias
         elif not self.short_code:
             self.short_code = generate_code()

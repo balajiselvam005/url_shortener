@@ -26,7 +26,7 @@ urlpatterns = [
     path('s/<str:code>/', redirect_view),
     path('dashboard/', dashboard),
     path('dashboard/bulk-import/', bulk_import),
-    path('toggle/<int:id>/', toggle_url),
+    path('toggle/<int:id>/', toggle_url, name='toggle_url'),
     path('dashboard/<str:code>/analytics/', analytics_view),
     path('api/shorten/', api_shorten),
     path('qr/<str:code>/', generate_qr),

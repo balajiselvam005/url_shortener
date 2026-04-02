@@ -8,6 +8,7 @@ logger = logging.getLogger(__name__)
 
 from django.http import JsonResponse, HttpResponse, HttpResponseRedirect
 from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
 from django.utils.timezone import now, timedelta
 from django.utils import timezone
 
@@ -46,7 +47,7 @@ def redirect_view(request, code):
         raise Http404("The link is inactive")
     
     if obj.expires_at and obj.expires_at < timezone.now():
-        raise HttpResponseGone("The link has expired")
+        return HttpResponseGone("The link has expired")
     
     try:
     
@@ -121,7 +122,7 @@ def api_shorten(request):
         "expires_at": str(obj.expires_at)
     })
 
-
+@require_POST
 @login_required
 def toggle_url(request, id):
     obj = get_object_or_404(ShortURL, id=id, created_by=request.user)
