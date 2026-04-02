@@ -2,12 +2,9 @@
 <html>
     <head>
         <title>URL Shortener</title>
-        <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
 
         <style>
-            
+
             :root {
                 --bg:          #07161B;
                 --bg-2:        #0C1F25;
@@ -29,18 +26,43 @@
                 --transition:  0.22s cubic-bezier(0.4,0,0.2,1);
             }
 
+            body.light {
+                --bg:          #f0f7f9;
+                --bg-2:        #e2eef2;
+                --surface:     #ffffff;
+                --surface-2:   #eaf4f7;
+                --border:      #c5dde3;
+                --border-h:    #8bbcc7;
+                --accent:      #3D737F;
+                --accent-h:    #4e8f9e;
+                --accent-2:    #2a6070;
+                --accent-glow: rgba(61,115,127,0.15);
+                --text:        #0d2d35;
+                --text-muted:  #3a6470;
+                --text-dim:    #7aadb5;
+                --danger:      #c0444e;
+                --success:     #3d9e72;
+            }
+
+            body.light {
+                background-image: radial-gradient(ellipse 80% 50% at 50% -10%, rgba(61,115,127,0.08) 0%, transparent 70%);
+            }
+
+            body, body * {
+                transition: background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease;
+            }
+
             *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
             html { scroll-behavior: smooth; }
 
             body {
-                font-family: 'DM Sans', sans-serif;
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
                 font-size: 15px;
                 background-color: var(--bg);
                 color: var(--text);
                 min-height: 100vh;
-                background-image:
-                    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(61,115,127,0.12) 0%, transparent 70%);
+                background-image: radial-gradient(ellipse 80% 50% at 50% -10%, rgba(61,115,127,0.12) 0%, transparent 70%);
                 -webkit-font-smoothing: antialiased;
             }
 
@@ -68,7 +90,7 @@
 
             .nav-left::before {
                 content: "⚡ snip";
-                font-family: 'Syne', sans-serif;
+                font-family: inherit;
                 font-weight: 800;
                 font-size: 18px;
                 color: var(--accent-2);
@@ -78,7 +100,7 @@
 
             .nav-left a,
             .nav-right a {
-                font-family: 'DM Sans', sans-serif;
+                font-family: inherit;
                 font-size: 13.5px;
                 font-weight: 500;
                 color: var(--text-muted);
@@ -104,7 +126,7 @@
             }
 
             h1, h2, h3, h4 {
-                font-family: 'Syne', sans-serif;
+                font-family: inherit;
                 letter-spacing: -0.03em;
             }
 
@@ -118,7 +140,7 @@
                 background: var(--surface);
                 border: 1px solid var(--border);
                 border-radius: var(--radius-lg);
-                padding: 28px 32px;
+                padding: 32px 36px;
                 margin-bottom: 24px;
                 transition: border-color var(--transition), box-shadow var(--transition);
             }
@@ -161,7 +183,7 @@
                 letter-spacing: 0.14em;
                 color: var(--text-dim);
                 font-weight: 600;
-                font-family: 'Syne', sans-serif;
+                font-family: inherit;
             }
 
             .chart-grid {
@@ -197,7 +219,7 @@
                 color: #07161B;
                 padding: 13px 16px;
                 text-align: left;
-                font-family: 'Syne', sans-serif;
+                font-family: inherit;
                 font-size: 11px;
                 font-weight: 700;
                 text-transform: uppercase;
@@ -227,7 +249,7 @@
                 border-radius: 8px;
                 padding: 11px 16px;
                 color: var(--text);
-                font-family: 'DM Sans', sans-serif;
+                font-family: inherit;
                 font-size: 14px;
                 width: 100%;
                 transition: border-color var(--transition), box-shadow var(--transition), background var(--transition);
@@ -249,40 +271,7 @@
                 box-shadow: 0 0 0 3px var(--accent-glow);
                 background: var(--surface);
             }
-<div class="card">
-        <form method="POST">
-            {% csrf_token %}
 
-            <div class="form-row" style="flex-direction: column;">
-
-                <div class="input-group">
-                    <label>Long URL</label>
-                    <input type="url" name="url" placeholder="https://example.com/very/long/url" required>
-                </div>
-
-                <div class="input-group">
-                    <label>Custom Alias <span style="color:var(--text-dim); font-weight:400; text-transform:none; letter-spacing:0;">(optional, max 6 chars)</span></label>
-                    <input type="text" name="custom_alias" placeholder="e.g. mylink" maxlength="6">
-                </div>
-
-                <div style="padding-top: 4px;">
-                    <button type="submit">⚡ Shorten URL</button>
-                </div>
-
-            </div>
-        </form>
-
-        {% if short_url %}
-            <div class="short-url-result">
-                <span>Your link →</span>
-                <a href="{{ short_url }}" target="_blank">{{ short_url }}</a>
-            </div>
-        {% endif %}
-
-        {% if error %}
-            <div class="error-msg">⚠ {{ error }}</div>
-        {% endif %}
-    </div>
             input::placeholder { color: var(--text-dim); }
 
             p > label {
@@ -292,7 +281,7 @@
                 text-transform: uppercase;
                 letter-spacing: 0.08em;
                 color: var(--text-muted);
-                font-family: 'Syne', sans-serif;
+                font-family: inherit;
                 margin-bottom: 6px;
             }
 
@@ -311,7 +300,7 @@
                 border: none;
                 padding: 11px 22px;
                 color: #07161B;
-                font-family: 'Syne', sans-serif;
+                font-family: inherit;
                 font-size: 13px;
                 font-weight: 700;
                 letter-spacing: 0.05em;
@@ -367,7 +356,7 @@
                 border-radius: 20px;
                 font-size: 11px;
                 font-weight: 700;
-                font-family: 'Syne', sans-serif;
+                font-family: inherit;
                 letter-spacing: 0.06em;
                 text-transform: uppercase;
             }
@@ -398,7 +387,7 @@
 
             .short-url-result span {
                 font-size: 12px;
-                font-family: 'Syne', sans-serif;
+                font-family: inherit;
                 font-weight: 700;
                 text-transform: uppercase;
                 letter-spacing: 0.1em;
@@ -406,7 +395,7 @@
             }
 
             .short-url-result a {
-                font-family: 'Syne', sans-serif;
+                font-family: inherit;
                 font-weight: 600;
                 font-size: 15px;
                 color: var(--accent-2);
@@ -435,9 +424,7 @@
             .input-group {
                 display: flex;
                 flex-direction: column;
-                gap: 7px;
-                flex: 1;
-                min-width: 180px;
+                gap: 6px;
             }
 
             .input-group label {
@@ -446,7 +433,7 @@
                 text-transform: uppercase;
                 letter-spacing: 0.1em;
                 color: var(--text-dim);
-                font-family: 'Syne', sans-serif;
+                font-family: inherit;
             }
 
             @keyframes fadeUp {
@@ -466,8 +453,8 @@
                 .form-row { flex-direction: column; }
                 .card { padding: 20px; }
             }
-        </style>
 
+        </style>
     </head>
 
     <body>
@@ -475,14 +462,28 @@
         <nav>
             <div class="nav-left">
                 <a href="/">Home</a>
-                
                 {% if user.is_authenticated %}
                     <a href="/dashboard/">Dashboard</a>
                 {% endif %}
-                    
             </div>
 
-            <div class="nav-right">
+            <div class="nav-right" style="display:flex; align-items:center; gap:8px;">
+
+                <button onclick="toggleTheme()" id="theme-btn" style="
+                    background: var(--surface-2);
+                    border: 1px solid var(--border);
+                    color: var(--text-muted);
+                    padding: 6px 12px;
+                    font-size: 14px;
+                    border-radius: 6px;
+                    cursor: pointer;
+                    transform: none;
+                    box-shadow: none;
+                    font-family: inherit;
+                    font-weight: 500;
+                    letter-spacing: 0;
+                ">🌙</button>
+
                 {% if user.is_authenticated %}
                     <form method="POST" action="/logout/" style="display:inline;">
                         {% csrf_token %}
@@ -491,7 +492,7 @@
                             border: none;
                             padding: 6px 14px;
                             color: var(--text-muted);
-                            font-family: 'DM Sans', sans-serif;
+                            font-family: inherit;
                             font-size: 13.5px;
                             font-weight: 500;
                             border-radius: 6px;
@@ -513,6 +514,21 @@
         <div class="container">
             {% block content %}{% endblock %}
         </div>
+
+        <script>
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === 'light') {
+                document.body.classList.add('light');
+                document.getElementById('theme-btn').textContent = '☀️';
+            }
+
+            function toggleTheme() {
+                const isLight = document.body.classList.toggle('light');
+                const btn = document.getElementById('theme-btn');
+                btn.textContent = isLight ? '☀️' : '🌙';
+                localStorage.setItem('theme', isLight ? 'light' : 'dark');
+            }
+        </script>
 
     </body>
 </html>
