@@ -25,7 +25,6 @@ class ShortURL(models.Model):
         if self.custom_alias:
             existing = ShortURL.objects.filter(short_code=self.custom_alias)
 
-            # Exclude current object (IMPORTANT)
             if self.pk:
                 existing = existing.exclude(pk=self.pk)
 

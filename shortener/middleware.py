@@ -11,6 +11,8 @@ def is_exempt(path):
         return True
     if path.startswith('/qr/'):
         return True
+    if path.startswith('/static/'):
+        return True
     return path in EXEMPT_URLS
 
 class LoginRequiredMiddleware:
